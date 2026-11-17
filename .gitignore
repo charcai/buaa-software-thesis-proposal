@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Keep only the main PDF preview in the repository
+*.pdf
+!/proposal.pdf
+!/example.pdf
+# LaTeX and latexmk intermediate files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+missfont.log

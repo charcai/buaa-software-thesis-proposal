@@ -1,0 +1,79 @@
+% 在本目录运行 latexmk -xelatex example.tex
+\documentclass[a4paper,12pt]{article}
+\usepackage{buaa-proposal}
+\usepackage{amsmath,booktabs}
+\newcommand{\ReportTitle}{面向复杂应用场景的信息管理系统设计与实现及性能优化研究}
+\newcommand{\StudentName}{示例姓名}
+\newcommand{\StudentID}{00000000}
+\newcommand{\SchoolSupervisor}{指导教师}
+\newcommand{\CompanySupervisor}{}
+\newcommand{\SupervisorCompany}{}
+\newcommand{\ReportYear}{2026}
+\newcommand{\ReportMonth}{11}
+\newcommand{\ReportDay}{18}
+\begin{document}
+\hypersetup{pageanchor=false}
+\MakeCover
+\ReportDecorationstrue
+\pagenumbering{Roman}
+\hypersetup{pageanchor=true}
+\tableofcontents
+\pagenumbering{arabic}
+\section{研究背景与目标}
+本示例用于检查长题目封面，以及正文、公式、图表和列表之间的排版。图\ref{fig:logo}和表\ref{tab:plan}演示交叉引用。相关方法见文献\cite{sample-a, sample-b}，重复引用见\cite{sample-a}。
+
+这是直接输入的普通段落。正文采用十二磅字体和固定的基本行距。较高的公式会撑开所在行，例如 $\displaystyle\frac{\sum_{i=1}^{n}x_i^2}{1+\sqrt{x}}$。
+
+这是另一个普通段落，用空行分段。
+\subsection{公式与列表}
+独立公式放在段落命令外部，可以使用标准公式环境。
+
+\begin{equation}
+\label{eq:cost}
+C=\sum_{i=1}^{n}\frac{w_i}{1+x_i}.
+\end{equation}
+式\eqref{eq:cost}给出示意目标函数。以下列表列出验证步骤。
+
+\begin{enumerate}
+\item 收集实验数据。
+\item 比较不同参数配置。
+  \begin{itemize}
+  \item 记录内存占用。
+  \item 统计处理时间。
+  \end{itemize}
+\end{enumerate}
+列表结束后继续正文。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=.42\linewidth]{assets/school-logo.jpeg}
+\caption{示例图片}\label{fig:logo}
+\end{figure}
+\begin{table}[htbp]
+\centering
+\caption{工作计划}\label{tab:plan}
+\begin{tabular}{ll}
+\toprule
+阶段 & 工作内容 \\
+\midrule
+第一阶段 & 文献阅读与需求分析 \\
+第二阶段 & 实现与实验验证 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\section{长段落与分页}
+\subsection{面向不同任务规模与资源约束的系统设计、性能评估与实验结果分析方法}
+\subsubsection{连续正文}
+\newcount\examplecount
+\examplecount=0
+\loop
+这一段用于检验连续正文的自然分页。研究将结合任务规模、资源约束和实际运行情况开展实验，记录系统吞吐量、响应时间和内存占用，并讨论不同配置对实验结果的影响。
+
+\advance\examplecount by 1
+\ifnum\examplecount<18
+\repeat
+\begin{thebibliography}{99}
+\bibitem{sample-a} 示例作者. 示例文献题名. 2026.
+\bibitem{sample-b} 另一位示例作者. 实验设计方法. 2026.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,75 @@
+% !LW recipe = latexmk (xelatex)
+% 原文件：附件1-软件学院本科毕设开题报告-模板.doc
+% 在 VS Code 中点击一次编译，latexmk 自动更新目录与页码。
+\documentclass[a4paper,12pt]{article}
+\usepackage{buaa-proposal}
+
+% ===== 封面填写区：在花括号内填写即可 =====
+\newcommand{\ReportTitle}{}
+\newcommand{\StudentName}{}
+\newcommand{\StudentID}{}
+\newcommand{\SchoolSupervisor}{}
+\newcommand{\CompanySupervisor}{}
+\newcommand{\SupervisorCompany}{}
+\newcommand{\ReportYear}{202}
+\newcommand{\ReportMonth}{}
+\newcommand{\ReportDay}{}
+
+\begin{document}
+\hypersetup{pageanchor=false}
+\MakeCover
+\ReportDecorationstrue
+\pagenumbering{Roman}
+\hypersetup{pageanchor=true}
+\tableofcontents
+\pagenumbering{arabic}
+
+\section{论文背景与意义}
+\subsection{选题来源与背景}
+说明论文选题的来源，如课题的提出单位，如果是教师题目，明确是教师命题，还是来源于具体项目，有具体项目的明确项目的委托单位；如果是企业题目，必须明确给出具体的企业信息和立题情况。
+
+说明项目相关的研究背景，项目背景等。
+
+
+\subsection{选题意义}
+围绕项目背景，讨论项目的什么现实和理论意义。
+
+
+\section{国内外研究现状分析}
+对比国内外类似业务、相关技术的发展动态，明确本课题的特点和必要性。必须给出相关参考文献的引用，\textcolor{red}{\cite{sample-a}}。\textcolor{red}{（此处为引用方式！！！！）}
+
+
+\section{研究目标和内容}
+\subsection{研究目标}
+{\songlatin 一段话明确说明本论文所要达到的核心目标。\par}
+
+\subsection{研究内容}
+为了达到论文目标，论文围绕研究目标所要开展的主要研究内容以及相关核心工作任务，每项研究内容按照一个段落展开写。\textcolor{red}{（☆☆ 此部分为论文重点之一，研究内容体现毕设的工作量！）}
+
+
+\section{总体方案和关键问题}
+\subsection{拟采取的技术方案}
+{\songlatin 给出论文总体的研究方案，对于软件系统开发的应有软件架构图，包括相关的技术方案选型；对于研究类的论文，给出总体研究方案和技术路线。\par}
+
+\subsection{关键问题/难点及解决思路}
+{\songlatin 针对论文中可能存在的重点和难点问题，展开讨论，给出初步的解决思路。\textcolor{red}{（☆☆ 此部分为论文重点之二，问题清晰，解决\textbf{思路}合理正确！）}\par}
+
+\subsection{预期成果和可能创新点}
+{\songlatin 说明论文工作形成的预期研究成果以及这其中可能的创新点，成果包括但不限于论文、软件系统、文档等。\par}
+
+
+\section{论文工作计划}
+\subsection{总体工作计划}
+{\songlatin 给出各项工作的时间安排，包括起止时间和主要工作内容。\par}
+
+\subsection{本人工作内容}
+{\songlatin 明确本人在整个项目中的角色和承担的工作内容，论文内容应主要以自己负责的工作为基础。\par}
+
+
+\begin{thebibliography}{99}
+\bibitem{sample-a} LLL
+\bibitem{sample-b} MMM
+\end{thebibliography}
+\noindent （\textcolor{red}{☆☆☆ 注意，参考文献左顶格，没有缩进！！！！}）
+
+\end{document}

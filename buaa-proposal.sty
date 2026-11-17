@@ -1,0 +1,248 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{buaa-proposal}[2026/11/18 Software School proposal layout]
+\RequirePackage{fontspec,xeCJK,geometry,graphicx,xcolor,eso-pic}
+\RequirePackage[superscript,nomove]{cite}
+\RequirePackage[unicode,hidelinks,bookmarksnumbered]{hyperref}
+
+% 公共写作接口见 README。内部命令统一使用 buaa@ 前缀，
+% expl3 临时变量使用 l__buaa_ 前缀，均由样式文件内部维护。
+
+% ===== 原稿字体：每个字体只解析一次；名称别名只指同一字体，不允许换字体 =====
+% 顺序：项目文件 -> 已安装的原字体（中英文名）-> Word 自带的同一字体文件。
+\ExplSyntaxOn
+\msg_new:nnn {buaa-proposal} {missing-font}
+  {Required~original~DOC~font~'#1'~was~not~found.\iow_newline:
+   Install~that~font~or~provide~its~exact~file~in~the~project.\iow_newline:
+   Compilation~stopped;~font~substitution~is~disabled.}
+% 参数依次为内部字体标识、系统英文名、系统中文名（可空）、
+% 项目字体文件名、Word 内置文件名、fontspec 选项。
+% 解析后的文件名和选项独立保存在 buaa@resolvedfont... 中。
+\cs_new_protected:Npn \buaa@requirefont #1#2#3#4#5#6
+  {
+    \tl_set:Nn \l_tmpa_tl {#4}
+    \tl_set:Nn \l_tmpb_tl {#6}
+    \file_if_exist:nF {#4}
+      {
+        \clist_map_inline:nn {#2,#3}
+          {\IfFontExistsTF{##1}
+            {\tl_set:Nn \l_tmpa_tl {##1}\clist_map_break:}{}}
+        \tl_if_eq:NnT \l_tmpa_tl {#4}
+          {
+            \file_if_exist:nTF {/Applications/Microsoft~Word.app/Contents/Resources/DFonts/#5}
+              {\tl_put_left:Nn \l_tmpb_tl
+                 {Path={/Applications/Microsoft~Word.app/Contents/Resources/DFonts/},}
+               \tl_set:Nn \l_tmpa_tl {#5}}
+              {\msg_fatal:nnn {buaa-proposal}{missing-font}{#2}}
+          }
+      }
+    \cs_gset:cpx {buaa@resolvedfont@#1} {\exp_not:V \l_tmpa_tl}
+    \cs_gset:cpx {buaa@resolvedfontoptions@#1} {\exp_not:V \l_tmpb_tl}
+  }
+% 参数依次为 fontspec 加载命令、新字体命令（setmainfont 等使用空值）、
+% 前面注册的内部字体标识。
+\cs_new_protected:Npn \buaa@loadfont #1#2#3
+  {\use:x {\exp_not:N #1 \exp_not:n {#2}
+    [\use:c {buaa@resolvedfontoptions@#3}]{\use:c {buaa@resolvedfont@#3}}}}
+\NewDocumentCommand \buaa@datepart {m m}
+  {\exp_args:No \tl_if_blank:nTF {#1} {#2} {#1\hspace{\buaa@value{date/part-gap}bp}#2}}
+\ExplSyntaxOff
+\buaa@requirefont{roman}{Times New Roman}{}{TimesNewRoman.ttf}{times.ttf}{}
+\buaa@requirefont{song}{SimSun}{宋体}{SimSun.ttc}{Simsun.ttc}{FontIndex=0,AutoFakeBold=2.2,AutoFakeSlant=0.2}
+\buaa@requirefont{hei}{SimHei}{黑体}{SimHei.ttf}{SimHei.ttf}{AutoFakeBold=2.2}
+\buaa@requirefont{xinwei}{STXinwei}{华文新魏}{STXinwei.ttf}{STXINWEI.ttf}{}
+\buaa@requirefont{kai}{KaiTi_GB2312}{楷体_GB2312}{KaiTi_GB2312.ttf}{KaiTi_GB2312.ttf}{}
+\buaa@requirefont{arial}{Arial}{}{Arial.ttf}{arial.ttf}{}
+\buaa@loadfont\setmainfont{}{roman}
+\buaa@loadfont\setCJKmainfont{}{song}
+\buaa@loadfont\newfontfamily{\songlatin}{song}
+\buaa@loadfont\newfontfamily{\heilatin}{hei}
+\buaa@loadfont\newfontfamily{\kailatin}{kai}
+\buaa@loadfont\newfontfamily{\toclatin}{arial}
+\buaa@loadfont\newCJKfontfamily{\heiti}{hei}
+\buaa@loadfont\newCJKfontfamily{\xinwei}{xinwei}
+\buaa@loadfont\newCJKfontfamily{\headerfont}{kai}
+
+% ===== 字体样式与常用尺寸 =====
+% 封面、页眉页脚的绝对坐标放在下方绘制代码旁，便于对照页面。
+% bp 为 Word 使用的磅；字号按 DOC 声明，而不是 PDF 导出时的量化值。
+\newcommand{\buaa@set}[2]{\expandafter\def\csname buaa@value@#1\endcsname{#2}}
+\newcommand{\buaa@value}[1]{\csname buaa@value@#1\endcsname}
+\newcommand{\buaa@style}[4]{%
+  \buaa@set{size/#1}{#2}\buaa@set{leading/#1}{#3}\buaa@set{font/#1}{#4}}
+\newcommand{\buaa@usestyle}[1]{%
+  \normalfont\buaa@value{font/#1}%
+  \fontsize{\buaa@value{size/#1}bp}{\buaa@value{leading/#1}bp}\selectfont}
+\buaa@style{body}{12}{24.4}{}
+\buaa@style{cover-title}{36}{40}{\xinwei}
+\buaa@style{cover-label}{14}{20}{\heiti}
+\buaa@style{cover-entry}{14}{20}{\heiti\bfseries\xeCJKsetup{CJKecglue=\hskip .25em}}
+\buaa@style{cover-date}{14}{20}{}
+\buaa@style{header}{9}{12}{\headerfont\kailatin}
+\buaa@style{footer-page}{9}{12}{}
+\buaa@style{section}{15}{24.4}{\heiti}
+\buaa@style{section-number}{15}{24.4}{}
+\buaa@style{subsection}{14}{24.4}{\heiti}
+\buaa@style{subsection-number}{14}{24.4}{}
+\buaa@style{subsubsection}{12}{16}{\heiti\heilatin}
+\buaa@style{subsubsection-number}{14}{16}{\heiti\heilatin\bfseries}
+\buaa@style{toc-title}{16}{20}{}
+\buaa@style{toc-section}{12}{20}{\heiti}
+\buaa@style{toc-subsection}{12}{20}{}
+\buaa@style{toc-subsubsection}{10}{20}{\itshape}
+\buaa@style{citation}{6}{7}{\songlatin}
+\buaa@set{body/indent}{24}
+\buaa@set{heading/before}{12}
+\buaa@set{heading/after}{8.12}
+\buaa@set{date/year-gap}{14.12}\buaa@set{date/unit-gap}{14.08}
+\buaa@set{date/part-gap}{3.48}\buaa@set{cover/label-gap}{56.16}
+\buaa@set{cover/rule-thickness}{0.48}
+\buaa@set{cover/value-x}{260.64}\buaa@set{cover/value-width}{198.24}
+\buaa@set{toc/width}{415.1}\buaa@set{toc/gap}{3}
+\buaa@set{toc/page-width}{7}\buaa@set{toc/top}{70.80}
+\buaa@set{toc/section/indent}{0}
+\buaa@set{toc/subsection/indent}{12}
+\buaa@set{toc/subsubsection/indent}{24}
+\buaa@set{toc/section/number-width}{15.67}
+\buaa@set{toc/subsection/number-width}{24}
+\buaa@set{toc/subsubsection/number-width}{36}
+\buaa@set{toc/section/page-font}{\toclatin}
+\buaa@set{toc/subsection/page-font}{\rmfamily}
+\buaa@set{toc/subsubsection/page-font}{\rmfamily\itshape}
+\geometry{paperwidth=595.2bp,paperheight=841.92bp,
+  left=84.96bp,right=56.69bp,top=84.96bp,bottom=70.90bp}
+\xeCJKsetup{PunctStyle=quanjiao}
+\xeCJKDeclareCharClass{CJK}{"2606}
+\hypersetup{pdftitle={本科毕业设计（论文）开题报告},pdfauthor={}}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\pagestyle{empty}
+\setlength{\parindent}{\buaa@value{body/indent}bp}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{1em}\setcounter{tocdepth}{3}
+\hfuzz=0.2pt\raggedbottom
+
+% ===== 封面、页眉页脚：坐标以纸张左上角为原点，文字位置为基线 =====
+\newcommand{\buaa@atxy}[3]{\put(\LenToUnit{#1bp},\LenToUnit{-#2bp}){#3}}
+\newif\ifReportDecorations
+\AddToShipoutPictureFG{\ifReportDecorations\AtPageUpperLeft{%
+  \buaa@atxy{230.73}{63.24}{{\buaa@usestyle{header}软件学院本科毕业设计（论文）开题报告}}%
+  \buaa@atxy{83.52}{67.68}{\rule{456.48bp}{0.72bp}}%
+  \buaa@atxy{83.52}{776.40}{\rule{456.48bp}{0.48bp}}%
+  \buaa@atxy{89.46}{789.12}{{\buaa@usestyle{header}北京航空航天大学软件学院}}%
+  \buaa@atxy{523.52}{789.12}{\makebox[0pt][r]{\buaa@usestyle{footer-page}%
+    {\songlatin-}\thepage{\songlatin-}}}%
+}\fi}
+% 长填写项按原字号折行，后续栏位与日期随之下移。
+\newbox\buaa@coverbox
+\newdimen\buaa@covershift
+\newdimen\buaa@coverextra
+% 可选参数为填写区横坐标和宽度，必选参数为首行基线、横线基线、
+% 标签和填写内容。坐标与宽度均以 bp 为单位。
+% 本命令在 MakeCover 的局部分组内累计填写栏的额外高度。
+\NewDocumentCommand{\buaa@coverfield}{O{\buaa@value{cover/value-x}} O{\buaa@value{cover/value-width}} m m m m}{%
+  \buaa@usestyle{cover-entry}%
+  \setbox\buaa@coverbox=\hbox{#6}%
+  \ifdim\wd\buaa@coverbox>#2bp
+    \setbox\buaa@coverbox=\vtop{\hsize=#2bp\parindent=0pt
+      \raggedright\strut #6\strut\par}%
+  \else
+    \setbox\buaa@coverbox=\hbox to #2bp{\hfil\strut #6\strut\hfil}%
+  \fi
+  \buaa@coverextra=\dimexpr\dp\buaa@coverbox-\dp\strutbox\relax
+  \put(\LenToUnit{161.28bp},-\LenToUnit{\dimexpr#3bp+\buaa@covershift\relax}){{\buaa@usestyle{cover-label}#5}}%
+  \put(\LenToUnit{#1bp},-\LenToUnit{\dimexpr#3bp+\buaa@covershift\relax}){\box\buaa@coverbox}%
+  \advance\buaa@covershift by \buaa@coverextra
+  \put(\LenToUnit{#1bp},-\LenToUnit{\dimexpr#4bp+\buaa@covershift\relax}){%
+    \rule{#2bp}{\buaa@value{cover/rule-thickness}bp}}%
+}
+\newcommand{\ReportDate}{\ReportYear\hspace{\buaa@value{date/year-gap}bp}年%
+  \hspace{\buaa@value{date/unit-gap}bp}\buaa@datepart{\ReportMonth}{月}%
+  \hspace{\buaa@value{date/unit-gap}bp}\buaa@datepart{\ReportDay}{日}}
+\newcommand{\MakeCover}{%
+  \AddToShipoutPictureFG*{\begingroup\AtPageUpperLeft{%
+    \buaa@atxy{197.1001}{223.0245}{\includegraphics[width=229.45bp,height=85.45bp]{assets/school-logo.jpeg}}%
+    \buaa@atxy{131.73}{273.36}{{\buaa@usestyle{cover-title}本科毕业设计（论文）}}%
+    \buaa@atxy{239.73}{312.00}{{\buaa@usestyle{cover-title}开题报告}}%
+    \buaa@covershift=0pt
+    \buaa@coverfield{414.48}{427.20}{毕业设计题目：}{\ReportTitle}%
+    \buaa@coverfield{443.28}{456.24}{姓\hspace{\buaa@value{cover/label-gap}bp}名：}{\StudentName}%
+    \buaa@coverfield{472.32}{485.04}{学\hspace{\buaa@value{cover/label-gap}bp}号：}{\StudentID}%
+    \buaa@coverfield{501.12}{513.84}{学院指导老师：}{\SchoolSupervisor}%
+    \buaa@coverfield{529.92}{542.64}{企业指导老师：}{\CompanySupervisor}%
+    \buaa@coverfield[259.92][198.96]{558.72}{571.44}{企业老师单位：}{\SupervisorCompany}%
+    \put(\LenToUnit{241.73bp},-\LenToUnit{\dimexpr702.48bp+\buaa@covershift\relax}){{\buaa@usestyle{cover-date}北京航空航天大学软件学院}}%
+    \put(\LenToUnit{325.65bp},-\LenToUnit{\dimexpr734.16bp+\buaa@covershift\relax}){\makebox[0pt][c]{\buaa@usestyle{cover-date}\ReportDate}}%
+  }\endgroup}\null\clearpage}
+
+% 正文字号和行距通过标准 normalsize 生效，普通段落直接使用。
+\let\buaa@normalsize\normalsize
+\renewcommand{\normalsize}{%
+  \buaa@normalsize
+  \fontsize{\buaa@value{size/body}bp}{\buaa@value{leading/body}bp}\selectfont}
+\AtBeginDocument{\normalsize}
+
+% 旧版便捷命令仅作为兼容入口，排版与普通段落相同。
+\newcommand{\BodyText}[2][\rmfamily]{\par\begingroup #1#2\par\endgroup}
+\let\ContinueText\BodyText
+\newcommand{\ReportBodyStart}{\normalsize}
+
+% 标准标题机制负责编号、引用、书签和分页。
+\renewcommand{\section}{\@startsection{section}{1}{0pt}%
+  {\buaa@value{heading/before}bp}{\buaa@value{heading/after}bp}%
+  {\buaa@usestyle{section}}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{0pt}%
+  {\buaa@value{heading/before}bp}{\buaa@value{heading/after}bp}%
+  {\buaa@usestyle{subsection}}}
+\renewcommand{\subsubsection}{\@startsection{subsubsection}{3}{0pt}%
+  {\buaa@value{heading/before}bp}{\buaa@value{heading/after}bp}%
+  {\buaa@usestyle{subsubsection}}}
+\renewcommand{\@seccntformat}[1]{%
+  {\ifcsname buaa@value@font/#1-number\endcsname\buaa@usestyle{#1-number}\fi
+   \csname the#1\endcsname}\quad}
+\let\Section\section
+\let\Subsection\subsection
+\let\NextSubsection\subsection
+\let\Subsubsection\subsubsection
+\newcommand{\Red}[1]{\textcolor{red}{#1}}
+% cite 宏包负责多篇引用、编号排序压缩及超链接，模板仅设置外观。
+\renewcommand{\OverciteFont}[1]{\buaa@usestyle{citation}[#1]}
+\renewcommand{\refname}{主要参考文献}
+% 使用标准 thebibliography/list/bibitem 机制，调整标题和左顶格样式。
+\renewenvironment{thebibliography}[1]
+  {\section{\refname}%
+   \list{\@biblabel{\@arabic\c@enumiv}}%
+     {\settowidth\labelwidth{\@biblabel{#1}}%
+      \setlength{\leftmargin}{0pt}%
+      \setlength{\itemindent}{\labelwidth}\addtolength{\itemindent}{\labelsep}%
+      \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}%
+      \def\makelabel##1{##1\hfil}\usecounter{enumiv}\let\p@enumiv\@empty\renewcommand{\theenumiv}{\@arabic\c@enumiv}}%
+   \sloppy\clubpenalty4000\widowpenalty4000\sfcode`\.=1000\relax}
+  {\def\@noitemerr{\@latex@warning{Empty bibliography}}\endlist}
+% 旧版引用命令复用标准引用，文献条目放在 thebibliography 环境内。
+\let\ReportCitation\cite
+\newcommand{\ReferenceItem}[2]{\bibitem{#1}#2}
+\newcommand{\ReferenceNote}[1]{\par\noindent #1\par}
+
+% 共用目录行引擎：正文标题保留其运行字体，点线与页码继承原 TOC 样式。
+\newcommand{\buaa@tocline}[3]{%
+  \par\begingroup\buaa@usestyle{toc-#1}\parindent=0pt
+    \def\numberline##1{\makebox[\buaa@value{toc/#1/number-width}bp][l]{##1}}%
+    \leftskip=\dimexpr\buaa@value{toc/#1/indent}bp+\buaa@value{toc/#1/number-width}bp\relax
+    \rightskip=\dimexpr\linewidth-\buaa@value{toc/width}bp+\buaa@value{toc/page-width}bp\relax
+    \parfillskip=-\buaa@value{toc/page-width}bp
+    \noindent\hspace*{-\buaa@value{toc/#1/number-width}bp}#2\nobreak
+    \hspace{\buaa@value{toc/gap}bp}%
+    {\buaa@value{toc/#1/page-font}\leaders\hbox{.}\hfill}%
+    \nobreak\hspace{\buaa@value{toc/gap}bp}%
+    \makebox[\buaa@value{toc/page-width}bp][r]{\buaa@value{toc/#1/page-font}#3}\par\endgroup}
+\renewcommand*\l@section[2]{\ifnum\value{tocdepth}>0\relax\buaa@tocline{section}{#1}{#2}\fi}
+\renewcommand*\l@subsection[2]{\ifnum\value{tocdepth}>1\relax\buaa@tocline{subsection}{#1}{#2}\fi}
+\renewcommand*\l@subsubsection[2]{%
+  \ifnum\value{tocdepth}>2\relax\buaa@tocline{subsubsection}{#1}{#2}\fi}
+\renewcommand{\tableofcontents}{%
+  \AddToShipoutPictureFG*{\AtPageUpperLeft{%
+    \buaa@atxy{287.73}{125.04}{{\buaa@usestyle{toc-title}目\hspace{48bp}录}}}}%
+  \vspace*{\dimexpr\buaa@value{toc/top}bp-\topskip\relax}\nointerlineskip%
+  \@starttoc{toc}\clearpage}
+\newcommand{\ReportContents}{\tableofcontents}
+\endinput
