@@ -8,7 +8,7 @@
 
 ## 快速开始
 
-安装包含 XeLaTeX 和 latexmk 的 TeX 发行版，例如 TeX Live 或 MacTeX，并准备下文列出的字体。模板使用 fontspec、xeCJK、geometry、graphicx、xcolor、eso-pic、cite 和 hyperref，综合示例还使用 amsmath 和 booktabs。
+安装包含 XeLaTeX 和 latexmk 的 TeX 发行版，例如 TeX Live 或 MacTeX，并准备下文列出的字体。模板使用 fix-cm、fontspec、xeCJK、geometry、graphicx、xcolor、eso-pic、cite 和 hyperref，综合示例还使用 amsmath 和 booktabs。
 
 打开 `proposal.tex`，填写顶部的封面信息，再将说明文字替换为自己的报告内容。
 
